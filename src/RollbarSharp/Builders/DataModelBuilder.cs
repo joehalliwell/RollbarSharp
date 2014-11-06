@@ -24,7 +24,7 @@ namespace RollbarSharp.Builders
         {
             var body = BodyModelBuilder.CreateExceptionBody(ex);
             var model = Create(level, body);
-            
+
             // if the exception has a fingerprint property, copy it to the notice
             if (!string.IsNullOrEmpty(body.Trace.Exception.Fingerprint))
                 model.Fingerprint = FingerprintHash(body.Trace.Exception.Fingerprint);
@@ -51,7 +51,7 @@ namespace RollbarSharp.Builders
         protected DataModel Create(string level, BodyModel body)
         {
             var model = new DataModel(level, body);
-            
+
             model.Environment = Configuration.Environment;
             model.Platform = Configuration.Platform;
             model.Language = Configuration.Language;
@@ -64,8 +64,8 @@ namespace RollbarSharp.Builders
             model.Request = RequestModelBuilder.CreateFromCurrentRequest(Configuration.ScrubParams);
             model.Server = ServerModelBuilder.CreateFromCurrentRequest();
             model.Server.GitSha = Configuration.GitSha;
-            model.Person = PersonModelBuilder.CreateFromCurrentRequest();
-            
+            model.Person = Configuration.ScrubPerson ? PersonModelBuilder.CreateFromCurrentRequest() : new PersonModel();
+
             return model;
         }
 

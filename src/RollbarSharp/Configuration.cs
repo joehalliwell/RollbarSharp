@@ -31,6 +31,7 @@ namespace RollbarSharp
                     "creditcard", "credit_card", "credit_card_number", "card_number", "ccnum", "cc_number"
                 };
 
+
         /// <summary>
         /// Encoding to use when communicating with the Rollbar endpoint (default: utf-8)
         /// </summary>
@@ -46,7 +47,7 @@ namespace RollbarSharp
         /// <summary>
         /// The server-side access token for your application in Rollbar.
         /// Also known as the post_server_item key
-        /// 
+        ///
         /// Setting: Rollbar.AccessToken
         /// Default: None. You have to set this.
         /// </summary>
@@ -54,7 +55,7 @@ namespace RollbarSharp
 
         /// <summary>
         /// Name of the environment this app is running in. Usually "production" or "staging"
-        /// 
+        ///
         /// Setting: Rollbar.Environment
         /// Default: production
         /// </summary>
@@ -62,7 +63,7 @@ namespace RollbarSharp
 
         /// <summary>
         /// Platform running the code. E.g. Windows or IIS.
-        /// 
+        ///
         /// Setting: Rollbar.Platform
         /// Default: <see cref="System.Environment.OSVersion"/>
         /// </summary>
@@ -70,7 +71,7 @@ namespace RollbarSharp
 
         /// <summary>
         /// Code language. Defaults to csharp.
-        /// 
+        ///
         /// Setting: Rollbar.Language
         /// Default: csharp
         /// </summary>
@@ -78,7 +79,7 @@ namespace RollbarSharp
 
         /// <summary>
         /// .NET Framework version
-        /// 
+        ///
         /// Setting: Rollbar.Framework
         /// Default: ".NET" + <see cref="System.Environment.Version"/>
         /// </summary>
@@ -86,7 +87,7 @@ namespace RollbarSharp
 
         /// <summary>
         /// GIT SHA hash of the running code
-        /// 
+        ///
         /// Setting: Rollbar.GitSha
         /// Default: None. You have to set this.
         /// </summary>
@@ -97,6 +98,12 @@ namespace RollbarSharp
         /// being sent to rollbar. Such as passwords, secret keys, etc.
         /// </summary>
         public string[] ScrubParams { get; set; }
+
+        /// <summary>
+        /// If true, don't attempt to populate the person field in exception reports.
+        /// Defaults to false.
+        /// </summary>
+        public bool ScrubPerson { get; set; }
 
         /// <summary>
         /// Settings used to serialize the payload to JSON when posting to Rollbar
@@ -122,6 +129,7 @@ namespace RollbarSharp
             Framework = ".NET " + System.Environment.Version;
             Language = DefaultLanguage;
             ScrubParams = DefaultScrubParams;
+            ScrubPerson = false;
         }
 
         /// <summary>
@@ -154,6 +162,8 @@ namespace RollbarSharp
             var scrubParams = GetSetting("Rollbar.ScrubParams");
             conf.ScrubParams = scrubParams == null ? DefaultScrubParams : scrubParams.Split(',');
 
+            conf.ScrubPerson = GetBoolSetting("Rollbar.ScrubPerson", conf.ScrubPerson);
+
             return conf;
         }
 
@@ -161,6 +171,14 @@ namespace RollbarSharp
         {
             var setting = ConfigurationManager.AppSettings[name];
             return string.IsNullOrEmpty(setting) ? fallback : setting;
+        }
+
+        protected static bool GetBoolSetting(string name, bool fallback) {
+            var setting = ConfigurationManager.AppSettings[name];
+            if (string.IsNullOrEmpty(setting)) return fallback;
+            bool val = fallback;
+            boolean.TryParse(setting, out val);
+            return val;
         }
     }
 }
