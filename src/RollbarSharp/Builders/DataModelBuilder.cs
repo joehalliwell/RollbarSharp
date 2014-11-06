@@ -64,7 +64,7 @@ namespace RollbarSharp.Builders
             model.Request = RequestModelBuilder.CreateFromCurrentRequest(Configuration.ScrubParams);
             model.Server = ServerModelBuilder.CreateFromCurrentRequest();
             model.Server.GitSha = Configuration.GitSha;
-            model.Person = Configuration.ScrubPerson ? PersonModelBuilder.CreateFromCurrentRequest() : new PersonModel();
+            model.Person = Configuration.ScrubPerson ? new PersonModel() : PersonModelBuilder.CreateFromCurrentRequest();
 
             return model;
         }
